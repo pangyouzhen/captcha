@@ -1,0 +1,5 @@
+torch
+torchvision
+execjs
+muggle_ocr
+requests

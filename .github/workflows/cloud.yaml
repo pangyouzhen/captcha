@@ -25,6 +25,7 @@ jobs:
 
       #  Runs a set of commands using the runners shell
       # step2: 将源码复制到服务器
+#      -  这里是服务器私钥 cat ~/.ssh/id_rsa
       - name: Deploy to Server
         uses: easingthemes/ssh-deploy@v2.0.8
         env:
