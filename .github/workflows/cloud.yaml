@@ -32,7 +32,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           REMOTE_HOST: ${{ secrets.HOST }}
           REMOTE_USER: ${{ secrets.USERNAME }}
-          SOURCE: './other/dockerfile/Dockerfile'
+          SOURCE: ''
           TARGET: '/data/captcha/'
           ARGS: '-avzr --delete'
 
