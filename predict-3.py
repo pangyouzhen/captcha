@@ -4,24 +4,28 @@ Created on Wed Feb 13 20:07:17 2019
 
 @author: icetong
 """
+import json
+import shutil
 
-import torch
-import torch.nn as nn
-from models import CNN
-from datasets import img_loader
-from torchvision.transforms import Compose, ToTensor
-from train import num_class
 import execjs
 import requests
+import torch
+import torch.nn as nn
+from torchvision.transforms import Compose, ToTensor
+
+from datasets import img_loader
+from models import CNN
+from train import num_class
+import loguru
 
 with open(r'/home/pang/Downloads/aes.min.js', 'r', encoding='utf-8') as f:
-    js = f.read()
+    aes_min_js = f.read()
 
 with open('/data/project/learn_code/other/encrty.js', 'r', encoding='utf-8') as fs:
-    js_file = fs.read()
+    encrpty_js = fs.read()
 
-ct = execjs.compile(js, cwd=r'/usr/lib/node_modules')
-js_load = execjs.compile(js_file, cwd=r'/usr/lib/node_modules')
+ct = execjs.compile(aes_min_js, cwd=r'/usr/lib/node_modules')
+js_load = execjs.compile(encrpty_js, cwd=r'/usr/lib/node_modules')
 uname = js_load.call('thsencrypt.encode', '')
 passwd = js_load.call('thsencrypt.encode', '')
 v = ct.call("v")
@@ -100,9 +104,15 @@ headers = {
     'Cookie': 'PHPSESSID=knstqaqbslsmns9ql3cdbqd91a91ee0n; cid=0bdf07ddd90f80d8706fd264827abd8a1618119272; v=%s' % v
 }
 
-response = requests.request("POST", url, headers=headers, data=payload)
+response: requests.Response = requests.request("POST", url, headers=headers, data=payload)
 response.encoding = 'utf-8'
 print(response.text)
-cookies = response.cookies
-cookie = requests.utils.dict_from_cookiejar(cookies)
-print(cookie)
+response_js = json.loads(response.text)
+print(response_js)
+if response_js["errorcode"] == 0:
+    shutil.move("ths_captcha.png", "./correct_capcha/%s.png" % pred)
+    cookies = response.cookies
+    cookie = requests.utils.dict_from_cookiejar(cookies)
+    print(cookie)
+elif response_js["errorcode"] == -11076:
+    shutil.move("ths_captcha.png", "./error_captcha/%s.png" % pred)
