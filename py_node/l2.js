@@ -19,18 +19,15 @@ async function readLine() {
 }
 
 (async () => {
-    const browser = await puppeteer.launch({headless: false, args: ['--start-maximized'],});
+    const browser = await puppeteer.launch({headless: true, args: ['--start-maximized'],});
     const page = await browser.newPage();
+//   跳过反扒检测
     await page.evaluateOnNewDocument(() => {
         Object.defineProperty(navigator, 'webdriver', {
             get: () => false,
         });
     });
     await page.setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36");
-    // await page.setViewport({
-    //     width: 1920,
-    //     height: 1080
-    // });
     await page.goto('https://www.iwencai.com');
     // 显示悬浮登陆
     await page.hover('div.login-box.auto_width > i');
@@ -41,65 +38,10 @@ async function readLine() {
 
     await page.waitForTimeout(4000)
     //一共三层iframe,没有timewait的第三层不会渲染完成
-    //切换iframe
-    // console.log('waiting for iframe with form to be ready.');
-    // await page.waitForSelector('iframe');
-    // console.log('iframe is ready. Loading iframe content');
-    // const elementHandle = await page.$(
-    //     '#login_iframe',
-    // );
-    // const frame = await elementHandle.contentFrame();
-    // console.log(frame);
-    // await frame.type('#Name', 'Bob', { delay: 100 });
-    // await console.log(page.frames());
-    // const targetFrameUrl = 'http://upass.iwencai.com/login';
-    // await console.log(page.frames().length);
-    // console.log(page.frames())
-    // console.log(page.frames())
-
-    // const frame = await page.frames().find(frame => frame.url().includes(targetFrameUrl));
     const frame = await page.frames()[2]
-    // console.log(frame)
-    // await frame.evaluate(() => {
-    //     console.log(document);
-    //     document.querySelector('#to_account_login').textContent;
-    // });
-
-    // await frame.waitFor('#to_account_login');
-    // console.log(frame)
     const text = await frame.$eval('#to_account_login', (element) => element.textContent);
     console.log(text);
-    // const phone = await frame.waitForSelector('#mobile');
-    // phone.type('123456');
-    // frame.focus("#mobile");
-    // phone.click()
-    // await frame.evaluate(() => {
-    //     document.getElementById('to_account_login')[0].click();
-    // });
-    // await frame.evaluate(() => {
-    //     document.querySelector('.base_bg.style_').style.display = 'yes';
-    //     document.querySelector("#to_account_login").textContent;
-    // });
-
-    // const display = await frame.evaluate(() =>
-    //     window.getComputedStyle(document.querySelector('#to_account_login')).display
-    // );
-    // for (let i = 0; i < 5; i++)
-    //     console.log(i)
-    // await page.keyboard.press('Tab');
-    // await frame.evaluate(() => {
-    //     $("#to_account_login").click();
-    // console.log(document.querySelector("#to_account_login").textContent);
-    // });
-    // await frame.evaluate(() => {
-    //     $("#to_account_login").click();
-    // });
-    // (await frame.$('#to_account_login')).click();
-    // await console.log(frame.click('#to_account_login'));
-    // await page.click();
-    // await frame.focus('#to_account_login');
     await frame.click('#to_account_login');
-
 
     const uname = await frame.waitForSelector('#uname');
     uname.type('pangtong126');
