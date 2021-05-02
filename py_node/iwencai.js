@@ -54,6 +54,7 @@ async function readLine() {
     // 用户输入验证码
     console.log("用户输入验证码");
     const captcha = await readLine();
+    console.log(captcha);
     account_captcha.type(captcha);
     await page.waitForTimeout(2000);
     await frame.click('div.b_f.pointer.tc.submit_btn.enable_submit_btn');
@@ -72,12 +73,12 @@ async function readLine() {
         await page.waitForTimeout(5000);
 
         //点击导出数据
-        await page.evaluate(() => {
-            document.getElementsByClassName('table-icon exp-icon')[0].click()
-        });
-        await page.waitForTimeout(1000);
-        await page.screenshot({path: 'download.png'});
-        console.log("导出成功");
+//        await page.evaluate(() => {
+//            document.getElementsByClassName('table-icon exp-icon')[0].click()
+//        });
+//        await page.waitForTimeout(1000);
+//        await page.screenshot({path: 'download.png'});
+//        console.log("导出成功");
     }
     await browser.close();
 })();

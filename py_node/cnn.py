@@ -11,7 +11,7 @@ from models import CNN
 from train import num_class
 
 model_path = '../checkpoints/model.pth'
-path = Path("../captcha_test")
+# path = Path("./node_captcha")
 source = [str(i) for i in range(0, 10)]
 source += [chr(i) for i in range(97, 97 + 26)]
 alphabet = ''.join(source)
@@ -26,11 +26,11 @@ cnn = CNN()
 if torch.cuda.is_available():
     cnn = cnn.cuda()
 cnn.load_state_dict(torch.load(model_path))
-q = path / "captcha_crop.png"
+# q = path / "captcha_crop.png"
 
 
 def crop_captcha(path):
-    img = Image.open("captcha.png")
+    img = Image.open(path / "captcha.png")
     # print(img.size)  # (1920, 1080)
     cropped = img.crop((455, 294, 575, 330))  # (left, upper, right, lower)
     cropped.save("./captcha_crop.png")
