@@ -1,33 +1,20 @@
 const puppeteer = require('puppeteer');
-const readline = require('readline');
+const request = require('request');
 
-// 用户输入验证码函数
-async function readLine() {
-
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-
-    return new Promise(resolve => {
-
-        rl.question('Enter captcha: ', (answer) => {
-            rl.close();
-            resolve(answer)
-        });
-    })
-}
 
 (async () => {
-    const browser = await puppeteer.launch({headless: true, args: ['--start-maximized'],});
+    const browser = await puppeteer.launch({headless: false, args: ['--start-maximized'],});
     const page = await browser.newPage();
-//   跳过反扒检测
     await page.evaluateOnNewDocument(() => {
         Object.defineProperty(navigator, 'webdriver', {
             get: () => false,
         });
     });
     await page.setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36");
+    // await page.setViewport({
+    //     width: 1920,
+    //     height: 1080
+    // });
     await page.goto('https://www.iwencai.com');
     // 显示悬浮登陆
     await page.hover('div.login-box.auto_width > i');
@@ -38,9 +25,8 @@ async function readLine() {
 
     await page.waitForTimeout(4000)
     //一共三层iframe,没有timewait的第三层不会渲染完成
+    //切换iframe
     const frame = await page.frames()[2]
-    const text = await frame.$eval('#to_account_login', (element) => element.textContent);
-    console.log(text);
     await frame.click('#to_account_login');
 
     const uname = await frame.waitForSelector('#uname');
@@ -53,9 +39,14 @@ async function readLine() {
     await page.screenshot({path: 'captcha.png'});
     // 用户输入验证码
     console.log("用户输入验证码");
-    const captcha = await readLine();
-    console.log(captcha);
-    account_captcha.type(captcha);
+    request('http://127.0.0.1:8081/cnn', {json: true}, (err, res, body) => {
+        if (err) {
+            return console.log(err);
+        }
+        console.log(body);
+        account_captcha.type(body);
+    });
+    await page.waitForTimeout(2000)
     await page.waitForTimeout(2000);
     await frame.click('div.b_f.pointer.tc.submit_btn.enable_submit_btn');
     await page.waitForTimeout(5000);
@@ -73,12 +64,12 @@ async function readLine() {
         await page.waitForTimeout(5000);
 
         //点击导出数据
-//        await page.evaluate(() => {
-//            document.getElementsByClassName('table-icon exp-icon')[0].click()
-//        });
-//        await page.waitForTimeout(1000);
-//        await page.screenshot({path: 'download.png'});
-//        console.log("导出成功");
+        // await page.evaluate(() => {
+        //     document.getElementsByClassName('table-icon exp-icon')[0].click()
+        // });
+        // await page.waitForTimeout(1000);
+        // await page.screenshot({path: 'download.png'});
+        // console.log("导出成功");
     }
     await browser.close();
 })();
